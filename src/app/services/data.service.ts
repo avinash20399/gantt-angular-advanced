@@ -8,13 +8,27 @@ import { environment } from '../../environments/environment';
 })
 export class DataService {
     private apiUrl = environment.apiUrl;
-
-    constructor(private http: HttpClient) {}
+    
+    constructor(private http: HttpClient) {
+        console.log("apiurl:", this.apiUrl);
+    }
 
     // GET request
     get<T>(endpoint: string, params?: any): Observable<T> {
+        console.log("endpoint:", endpoint);
+        console.log("params:", params);
+        
+        // Remove any leading slashes from endpoint and trailing slashes from apiUrl
+        const cleanEndpoint = endpoint.replace(/^\/+/, '');
+        const cleanApiUrl = this.apiUrl.replace(/\/+$/, '');
+        
         const httpParams = new HttpParams({ fromObject: params || {} });
-        return this.http.get<T>(`${this.apiUrl}/${endpoint}`, {
+        const fullUrl = `${cleanApiUrl}/${cleanEndpoint}`;
+        
+        console.log("Full URL before request:", fullUrl);
+        console.log("HTTP Params:", httpParams.toString());
+        
+        return this.http.get<T>(fullUrl, {
             params: httpParams,
         });
     }

@@ -1,45 +1,123 @@
 <div class="modal-backdrop">
     <div class="modal">
-        <h2>Import Data | Project Plan</h2>
-        <div class="stepper">
-            <div [class.active]="step === 1">1. Download template</div>
-            <div [class.active]="step === 2">2. Upload filled in sheet</div>
-            <div [class.active]="step === 3">3. Validate data</div>
-        </div>
-
-        <div *ngIf="step === 1">
-            <p>
-                Download the Excel template and fill in your data as per the
-                format.
-            </p>
-            <a href="assets/data/ProjectPlanTemplate.xlsx" download>
-                <button>Download Template</button>
-            </a>
-            <button (click)="step = 2">Next</button>
-        </div>
-
-        <div *ngIf="step === 2">
-            <p>Upload your filled Excel file (.xlsx):</p>
-            <input type="file" (change)="onFileChange($event)" accept=".xlsx" />
-            <button (click)="step = 1">Back</button>
-        </div>
-
-        <div *ngIf="step === 3">
-            <p>Validate your data before import:</p>
-            <button (click)="validateData()">Validate Data</button>
-            <div *ngIf="validationResults.length === 0 && uploadedData.length">
-                <p class="success">All rows are valid!</p>
-            </div>
-            <div *ngIf="validationResults.length">
-                <div *ngFor="let result of validationResults">
-                    <p class="error">
-                        Row {{ result.row }}: {{ result.errors.join(', ') }}
-                    </p>
+        <h2>Import Project Plan</h2>
+        
+        <div [hidden]="c_ValidationModeOn" class="import-container">
+            <div class="stepper">
+                <div class="step" [class.active]="step === 1" [class.completed]="step > 1" (click)="onIndexChange(0)">
+                    <div class="step-circle">
+                        <span class="step-number">1</span>
+                        <span class="step-text">Download template</span>
+                    </div>
+                </div>
+                <div class="step" [class.active]="step === 2" [class.completed]="step > 2" (click)="onIndexChange(1)">
+                    <div class="step-circle">
+                        <span class="step-number">2</span>
+                        <span class="step-text">Upload filled in sheet</span>
+                    </div>
+                </div>
+                <div class="step" [class.active]="step === 3" (click)="onIndexChange(2)">
+                    <div class="step-circle">
+                        <span class="step-number">3</span>
+                        <span class="step-text">Validate data</span>
+                    </div>
                 </div>
             </div>
-            <button (click)="step = 2">Back</button>
+
+            <div class="content-box">
+                <!-- Download Template Step -->
+                <div class="step-content" [hidden]="step !== 1">
+                    <div class="download-section">
+                        <div class="d-flex justify-content-center">
+                            <i class="fas fa-download" style="font-size: 30px; color: #e13f00"></i>
+                        </div>
+                        <div class="file-link">
+                            <a [href]="fileImportURL" download (click)="downloadTemplate()">
+                                KTern Model Template - {{ downloadingTemplateFor }}.xlsx
+                            </a>
+                        </div>
+                        <div class="instruction-text">
+                            Kindly ensure that you strictly adhere to this template before uploading your data
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Sheet Step -->
+                <div class="step-content" [hidden]="step !== 2">
+                    <div class="upload-section">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <form [formGroup]="myForm">
+                            <div class="form-group">
+                                <input 
+                                    type="file" 
+                                    id="fileUpload"
+                                    formControlName="file"
+                                    (change)="onFileSelected($event)"
+                                    accept=".xlsx"
+                                    style="display: none"
+                                />
+                                <label for="fileUpload" class="upload-text">Click to upload file</label>
+                                <div class="file-status">{{ fileName || 'No file chosen' }}</div>
+                            </div>
+                        </form>
+                        <div class="upload-instruction">
+                            You can upload only .xlsx file with a specified set of columns as long as it has atleast 1 record per row
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validate Data Step -->
+                <div class="step-content" [hidden]="step !== 3">
+                    <div class="validate-section">
+                        <div class="d-flex justify-content-center">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 30px; color: #e13f00"></i>
+                        </div>
+                        <button class="validate-btn" (click)="validateEntity()" [disabled]="!readyToValidate">
+                            Validate Data
+                        </button>
+                        <div class="validate-instruction">
+                            Allow KTern to validate the data before you proceed
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <button class="close-btn" (click)="closeModal()">Close</button>
+        <!-- Validation Results -->
+        <div [hidden]="!c_ValidationModeOn" class="validation-container">
+            <div class="validation-header">
+                <span class="validation-title">Validation Results</span>
+                <button class="retry-btn" (click)="validateEntity()" [disabled]="!readyToValidate">
+                    Try Again
+                </button>
+            </div>
+            
+            <div class="validation-list" *ngIf="c_ValidationResult.length">
+                <div class="list-header">
+                    Found {{ c_ErrorsCount }} error(s) in the uploaded file
+                </div>
+                <div class="list-items">
+                    <div class="list-item" *ngFor="let error of c_ValidationResult">
+                        {{ error }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Message when no errors -->
+            <div class="validation-success" *ngIf="c_ValidationModeOn && c_ErrorsCount === 0">
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    Validation successful! Your data is ready to be imported.
+                </div>
+            </div>
+        </div>
+
+        <div [hidden]="hideImportSheet" class="import-sheet-container">
+            <div #importSheet></div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+        </div>
     </div>
 </div>

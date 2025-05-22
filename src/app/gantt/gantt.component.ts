@@ -29,20 +29,31 @@ export class GanttComponent implements AfterViewInit, OnInit {
     }
 
     private loadInitialData() {
-        this.dataService.get<any>('gantt/data').subscribe({
+        console.log('Starting loadInitialData...');
+        const params = {
+            project: '66300cee23006656a617f366',
+            timezone: 'Asia/Calcutta'
+        };
+        console.log('Request params:', params);
+        
+        this.dataService.get<any>('projectmanagement/getAllTasksBryntumStruc', params).subscribe({
             next: (response) => {
-                if (response && response.data && response.data.length > 0) {
+                console.log('Response received:', response);
+                if (response) {
                     // We have data, load it into the Gantt
                     const gantt = this.ganttComponent.instance;
-                    gantt.project.loadInlineData(response.data);
+                    gantt.project.loadInlineData(response);
                 } else {
                     // No data available, show import modal
                     this.showImportModal = true;
                 }
             },
             error: (error) => {
-                console.error('Error loading Gantt data:', error);
-                // Show error message to user
+                console.error('Error details:', {
+                    status: error.status,
+                    message: error.message,
+                    error: error.error
+                });
                 this.showImportModal = true;
             },
         });
