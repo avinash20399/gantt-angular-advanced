@@ -16,10 +16,15 @@ const ganttProps: BryntumGanttProps = {
         taskModelClass: Task,
         transport: {
             load: {
-                url: 'assets/data/launch-saas.json',
+                url: 'api/gantt/data',
+                method: 'GET',
+            },
+            sync: {
+                url: 'api/gantt/sync',
+                method: 'POST',
             },
         },
-        autoLoad: true,
+        autoLoad: false,
 
         // The State TrackingManager, which the UndoRedo widget in the toolbar uses
         stm: {

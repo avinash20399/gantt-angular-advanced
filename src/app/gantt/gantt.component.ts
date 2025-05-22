@@ -1,7 +1,8 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { BryntumGanttComponent } from '@bryntum/gantt-angular';
 import { Gantt } from '@bryntum/gantt';
 import ganttProps from './gantt.config';
+import { DataService } from '../services/data.service';
 
 // Extend the Gantt type to include our custom property
 declare module '@bryntum/gantt' {
@@ -15,11 +16,37 @@ declare module '@bryntum/gantt' {
     templateUrl: './gantt.component.html',
     styleUrls: ['./gantt.component.scss'],
 })
-export class GanttComponent implements AfterViewInit {
+export class GanttComponent implements AfterViewInit, OnInit {
     @ViewChild('gantt') ganttComponent: BryntumGanttComponent;
     ganttProps = ganttProps;
     changedCells: any[] = [];
     showImportModal = false;
+
+    constructor(private dataService: DataService) {}
+
+    ngOnInit() {
+        this.loadInitialData();
+    }
+
+    private loadInitialData() {
+        this.dataService.get<any>('gantt/data').subscribe({
+            next: (response) => {
+                if (response && response.data && response.data.length > 0) {
+                    // We have data, load it into the Gantt
+                    const gantt = this.ganttComponent.instance;
+                    gantt.project.loadInlineData(response.data);
+                } else {
+                    // No data available, show import modal
+                    this.showImportModal = true;
+                }
+            },
+            error: (error) => {
+                console.error('Error loading Gantt data:', error);
+                // Show error message to user
+                this.showImportModal = true;
+            },
+        });
+    }
 
     ngAfterViewInit(): void {
         // Get the gantt instance
@@ -40,6 +67,17 @@ export class GanttComponent implements AfterViewInit {
                 }
             },
         });
+
+        // Listen for sync events
+        gantt.project.on({
+            sync: ({ success, response }) => {
+                if (success) {
+                    console.log('Data synced successfully:', response);
+                } else {
+                    console.error('Sync failed:', response);
+                }
+            },
+        });
     }
 
     getChangedCells() {
@@ -49,7 +87,6 @@ export class GanttComponent implements AfterViewInit {
     // New method to handle toolbar actions
     handleToolbarAction(action: string, data?: any) {
         console.log('Toolbar action:', action, data);
-        // Add your custom logic here
         switch (action) {
             case 'getChangedCells':
                 return this.getChangedCells();
@@ -69,8 +106,24 @@ export class GanttComponent implements AfterViewInit {
     // Handle import data
     onImportData(data: any) {
         console.log('Import data:', data);
-        // TODO: Implement the actual import logic here
-        this.showImportModal = false;
+        // Send the imported data to the server
+        // http://localhost:3000/project-plan/import
+        // this.dataService.post<any>('gantt/import', data).subscribe({
+        this.dataService
+            .post<any>('http://localhost:3000/project-plan/import', data)
+            .subscribe({
+                next: (response) => {
+                    console.log('Import response:', response);
+                    // Reload the Gantt with the new data
+                    const gantt = this.ganttComponent.instance;
+                    gantt.project.loadInlineData(response.data);
+                    this.showImportModal = false;
+                },
+                error: (error) => {
+                    console.error('Error importing data:', error);
+                    // Show error message to user
+                },
+            });
     }
 
     openImportModal() {
