@@ -1,0 +1,45 @@
+<div class="modal-backdrop">
+    <div class="modal">
+        <h2>Import Data | Project Plan</h2>
+        <div class="stepper">
+            <div [class.active]="step === 1">1. Download template</div>
+            <div [class.active]="step === 2">2. Upload filled in sheet</div>
+            <div [class.active]="step === 3">3. Validate data</div>
+        </div>
+
+        <div *ngIf="step === 1">
+            <p>
+                Download the Excel template and fill in your data as per the
+                format.
+            </p>
+            <a href="assets/data/ProjectPlanTemplate.xlsx" download>
+                <button>Download Template</button>
+            </a>
+            <button (click)="step = 2">Next</button>
+        </div>
+
+        <div *ngIf="step === 2">
+            <p>Upload your filled Excel file (.xlsx):</p>
+            <input type="file" (change)="onFileChange($event)" accept=".xlsx" />
+            <button (click)="step = 1">Back</button>
+        </div>
+
+        <div *ngIf="step === 3">
+            <p>Validate your data before import:</p>
+            <button (click)="validateData()">Validate Data</button>
+            <div *ngIf="validationResults.length === 0 && uploadedData.length">
+                <p class="success">All rows are valid!</p>
+            </div>
+            <div *ngIf="validationResults.length">
+                <div *ngFor="let result of validationResults">
+                    <p class="error">
+                        Row {{ result.row }}: {{ result.errors.join(', ') }}
+                    </p>
+                </div>
+            </div>
+            <button (click)="step = 2">Back</button>
+        </div>
+
+        <button class="close-btn" (click)="closeModal()">Close</button>
+    </div>
+</div>

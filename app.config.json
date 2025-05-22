@@ -1,0 +1,33 @@
+{
+  "index": {
+    "template": "app.index.ejs",
+    "folder": "src",
+    "bundles": [
+      "es6"
+    ]
+  },
+  "title": "Advanced demo (Angular)",
+  "description": "This demo shows an advanced configuration of the Bryntum Angular Gantt chart in an Angular app",
+  "source": [
+    "angular.json",
+    "package.json",
+    "src/app/app.component.html",
+    "src/app/app.component.scss",
+    "src/app/app.component.spec.ts",
+    "src/app/app.component.ts",
+    "src/app/app.module.ts",
+    "src/app/gantt/gantt.component.html",
+    "src/app/gantt/gantt.component.ts",
+    "src/app/gantt/gantt.config.ts",
+    "src/app/lib/GanttToolbar.js",
+    "src/app/lib/StatusColumn.js",
+    "src/app/lib/Task.js",
+    "src/assets/data/launch-saas.json",
+    "src/index.html",
+    "src/main.ts",
+    "src/styles.scss",
+    "src/tsconfig.app.json",
+    "src/tsconfig.spec.json",
+    "tsconfig.json"
+  ]
+}

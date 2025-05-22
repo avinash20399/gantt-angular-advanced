@@ -1,0 +1,27 @@
+<bryntum-gantt
+    #gantt
+    [baselinesFeature]="ganttProps.baselinesFeature"
+    [columnLines]="ganttProps.columnLines"
+    [columns]="ganttProps.columns"
+    [dependencyEditFeature]="ganttProps.dependencyEditFeature"
+    [endDate]="ganttProps.endDate"
+    [filterFeature]="ganttProps.filterFeature"
+    [labelsFeature]="ganttProps.labelsFeature"
+    [progressLineFeature]="ganttProps.progressLineFeature"
+    [project]="ganttProps.project"
+    [resourceImageFolderPath]="ganttProps.resourceImageFolderPath"
+    [rollupsFeature]="ganttProps.rollupsFeature"
+    [startDate]="ganttProps.startDate"
+    [subGridConfigs]="ganttProps.subGridConfigs"
+    [tbar]="ganttProps.tbar"
+    [dependencyIdField]="ganttProps.dependencyIdField"
+    [timeRangesFeature]="ganttProps.timeRangesFeature"
+></bryntum-gantt>
+
+<button (click)="openImportModal()">Import Plan</button>
+
+<app-import-plan-modal
+    *ngIf="showImportModal"
+    (close)="showImportModal = false"
+    (import)="onImportData($event)"
+></app-import-plan-modal>
