@@ -1,93 +1,154 @@
 .compact-toolbar {
-    padding: 0.5rem !important;
+    padding: 0.2rem 0.4rem !important;
     display: flex !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: 0.15rem !important;
+    min-height: unset !important;
+    height: auto !important;
+    background-color: #fff !important;
+    border-bottom: 1px solid #e0e0e0 !important;
     
     .b-button {
-        padding: 0.35rem 0.6rem !important;
         background-color: transparent !important;
-        border: 1px solid #d9d9d9 !important;
-        
-        &:not(.b-has-text) {
-            padding: 0.35rem !important;
-            min-width: 2.2rem !important;
-            height: 2.2rem !important;
+        border: 1px solid #e0e0e0 !important;
+        min-width: 2.2rem !important;
+        height: 1.6rem !important;
+        padding: 0.35rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 2px !important;
+
+        &.b-has-text {
+            padding: 0 0.8rem !important;
+            min-width: max-content !important;
+            white-space: nowrap !important;
+            font-size: 0.8rem !important;
+            
+            .b-fa {
+                margin-right: 0.4rem !important;
+            }
         }
 
         &:hover {
-            background-color: rgba(0, 0, 0, 0.04) !important;
-            border-color: #bfbfbf !important;
+            background-color: #f5f5f5 !important;
+            border-color: #d9d9d9 !important;
         }
 
         &:active {
-            background-color: rgba(0, 0, 0, 0.08) !important;
+            background-color: #e6e6e6 !important;
+        }
+
+        &[disabled] {
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
         }
     }
 
     .b-button-group {
         display: flex !important;
-        gap: 0.3rem !important;
-        padding: 0 0.2rem !important;
+        gap: 0 !important;
+        align-items: center !important;
+        height: 2.2rem !important;
         
+        .b-button {
+            border-radius: 0 !important;
+            margin: 0 !important;
+            border-right: none !important;
+
+            &:first-child {
+                border-top-left-radius: 2px !important;
+                border-bottom-left-radius: 2px !important;
+            }
+
+            &:last-child {
+                border-right: 1px solid #e0e0e0 !important;
+                border-top-right-radius: 2px !important;
+                border-bottom-right-radius: 2px !important;
+            }
+        }
+
         &:not(:last-child) {
-            margin-right: 0.5rem !important;
+            margin-right: 0.6rem !important;
             position: relative !important;
             
             &::after {
                 content: '' !important;
                 position: absolute !important;
-                right: -0.5rem !important;
+                right: -0.3rem !important;
                 top: 15% !important;
                 height: 70% !important;
                 width: 1px !important;
-                background-color: rgba(0, 0, 0, 0.1) !important;
+                background-color: #e0e0e0 !important;
             }
         }
     }
 
+    .b-theme-material .b-gantt > .b-toolbar .filter-by-name label{
+        display:block;
+      }
+
     .b-textfield {
-        height: 2.2rem !important;
-        margin-left: 0.5rem !important;
+        height: 2.6rem !important;
+        margin-left: 0.3rem !important;
         
         input {
             height: 100% !important;
-            padding: 0.35rem 0.7rem !important;
+            padding: 0 0.8rem !important;
+            border: 1px solid #e0e0e0 !important;
             border-radius: 4px !important;
+            font-size: 0.8rem !important;
+
+            &:hover {
+                border-color: #d9d9d9 !important;
+            }
+
+            &:focus {
+                border-color: #1890ff !important;
+                box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+            }
         }
     }
 
-    // Make icons slightly smaller but keep them crisp
     .b-fa {
-        font-size: 1rem !important;
+        font-size: 0.85rem !important;
         line-height: 1 !important;
         color: #595959 !important;
     }
 
-    // Adjust dropdown menus
-    .b-menu {
-        padding: 0.4rem !important;
-        border-radius: 4px !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-        
-        .b-menu-item {
-            padding: 0.4rem 0.6rem !important;
-            border-radius: 3px !important;
-            
-            &:hover {
-                background-color: rgba(0, 0, 0, 0.04) !important;
-            }
-        }
-    }
-
-    // Style for the import button on the right
-    .b-blue {
+    // Style for special buttons
+    .b-blue, .b-read-only {
         background-color: #1890ff !important;
         border-color: #1890ff !important;
+        color: white !important;
+        
+        .b-fa {
+            color: white !important;
+        }
         
         &:hover {
             background-color: #40a9ff !important;
             border-color: #40a9ff !important;
+        }
+    }
+
+    // Dropdown button styles
+    .b-icon-caret-down {
+        font-size: 0.7rem !important;
+        margin-left: 0.3rem !important;
+    }
+
+    // View level dropdown
+    .b-field-inner {
+        height: 2.5rem !important;
+        
+        .b-widget {
+            height: 100% !important;
+            border-color: #e0e0e0 !important;
+            
+            &:hover {
+                border-color: #d9d9d9 !important;
+            }
         }
     }
 } 

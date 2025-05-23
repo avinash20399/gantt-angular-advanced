@@ -142,74 +142,89 @@ export default class GanttToolbar extends Toolbar {
                                 ],
                             },
                         },
-                        {
-                            type: 'button',
-                            ref: 'settingsButton',
-                            icon: 'b-fa b-fa-cogs',
-                            tooltip: 'Settings',
-                            toggleable: true,
-                            menu: {
-                                type: 'popup',
-                                anchor: true,
-                                cls: 'settings-menu',
-                                layoutStyle: {
-                                    flexDirection: 'column',
-                                },
-                                onBeforeShow: 'up.onSettingsShow',
-                                items: [
-                                    {
-                                        type: 'slider',
-                                        ref: 'rowHeight',
-                                        text: 'Row height',
-                                        width: '12em',
-                                        showValue: true,
-                                        min: 30,
-                                        max: 70,
-                                        onInput: 'up.onSettingsRowHeightChange',
-                                    },
-                                    {
-                                        type: 'slider',
-                                        ref: 'barMargin',
-                                        text: 'Bar margin',
-                                        width: '12em',
-                                        showValue: true,
-                                        min: 0,
-                                        max: 10,
-                                        onInput: 'up.onSettingsMarginChange',
-                                    },
-                                ],
-                            },
-                        },
+                        //{
+                        //    type: 'button',
+                        //    ref: 'settingsButton',
+                        //    icon: 'b-fa b-fa-cogs',
+                        //    tooltip: 'Settings',
+                        //    toggleable: true,
+                        //    menu: {
+                        //        type: 'popup',
+                        //        anchor: true,
+                        //        cls: 'settings-menu',
+                        //        layoutStyle: {
+                        //            flexDirection: 'column',
+                        //        },
+                        //        onBeforeShow: 'up.onSettingsShow',
+                        //        items: [
+                        //            {
+                        //                type: 'slider',
+                        //                ref: 'rowHeight',
+                        //                text: 'Row height',
+                        //                width: '12em',
+                        //                showValue: true,
+                        //                min: 30,
+                        //                max: 70,
+                        //                onInput: 'up.onSettingsRowHeightChange',
+                        //            },
+                        //            {
+                        //                type: 'slider',
+                        //                ref: 'barMargin',
+                        //                text: 'Bar margin',
+                        //                width: '12em',
+                        //                showValue: true,
+                        //                min: 0,
+                        //                max: 10,
+                        //                onInput: 'up.onSettingsMarginChange',
+                        //            },
+                        //        ],
+                        //    },
+                        //},
                     ],
                 },
                 {
                     type: 'textfield',
-                    ref: 'filterByName',
-                    cls: 'filter-by-name',
-                    width: '15em',
+                    ref: 'plainSearch',
+                    cls: 'b-textfield b-contains-focus',
+                    width: '16em',
+                    height: '2.5em',
                     placeholder: 'Find tasks by name',
-                    clearable: true,
+                    clearable: false,
+                    //triggers: {
+                    //    expand: {
+                    //        align: 'end',
+                    //        cls: 'b-fa b-fa-angle-down',
+                    //        weight: 100
+                    //    }
+                    //},
                     keyStrokeChangeDelay: 100,
-                    triggers: {
-                        filter: {
-                            align: 'end',
-                            cls: 'b-fa b-fa-filter',
-                        },
-                    },
-                    onChange: 'up.onFilterChange',
+                    onChange: 'up.onPlainSearchChange'
                 },
                 "->",
+                {
+                    type: 'buttonGroup',
+                    items: [
+                        {
+                            ref: 'addTaskButton',
+                            icon: 'b-fa b-fa-filter',
+                            cls: 'b-raised',
+                            tooltip: 'Filter',
+                            onAction: 'up.onFilterChange',
+                        },
+                    ],
+                },
                 {
                     type: "buttonGroup",
                     items: [
                         {
                             ref: 'importPlanButton',
                             icon: 'b-fa b-fa-file-import',
+                            text: 'Import Planner',
                             tooltip: 'Import project plan',
                             onAction: 'up.onImportPlanClick',
                         },
                     ]
-                }
+                },
             ],
         };
     }
@@ -343,6 +358,11 @@ export default class GanttToolbar extends Toolbar {
                 replace: true,
             });
         }
+    }
+
+    onPlainSearchChange({ value }) {
+        const plainValue = value || '';
+        this.triggerGanttAction('plainSearch', plainValue);
     }
 
     onFeaturesClick({ source: item }) {
