@@ -291,6 +291,10 @@ $background-color: #fff;
             
             i {
                 font-size: 1.2rem;
+                
+                &.fa-spin {
+                    color: $brand-color;
+                }
             }
         }
     }
@@ -318,5 +322,34 @@ $background-color: #fff;
         &:hover {
             color: $brand-color;
         }
+    }
+}
+
+// Loading state styles
+.modal-backdrop.importing {
+    pointer-events: none;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    background-color: #ccc;
+}
+
+.importing-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+
+    .loading-spinner {
+        color: $brand-color;
+        font-size: 2rem;
     }
 }

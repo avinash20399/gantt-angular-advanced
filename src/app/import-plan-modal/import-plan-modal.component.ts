@@ -44,6 +44,7 @@ export class ImportPlanModalComponent {
     c_ErrorsCount: number = 0;
     readyToValidate: boolean = false;
     hideImportSheet: boolean = true;
+    isImporting: boolean = false;
 
     // Data storage
     uploadedData: ProjectPlanNode[] = [];
@@ -60,7 +61,9 @@ export class ImportPlanModalComponent {
     }
 
     onIndexChange(index: number) {
-        this.step = index + 1;
+        if (!this.isImporting) {
+            this.step = index + 1;
+        }
     }
 
     downloadTemplate() {
@@ -88,14 +91,13 @@ export class ImportPlanModalComponent {
     }
 
     validateEntity() {
+        if (this.isImporting) return;
+        
         this.c_ValidationModeOn = true;
         this.validationResults = [];
         console.log('uploadedData:', this.uploadedData);
         this.uploadedData.forEach((row, idx) => {
             const errors: string[] = [];
-            console.log('row:', row);
-            console.log('idx:', idx);
-            console.log('row.wbs:', row["wbs"],row["WBS"]);
             // Validation rules based on your DTO
             if (!row["WBS"] || !/^[0-9]+(\.[0-9]+)*$/.test(row["WBS"])) {
                 errors.push('WBS must be in format like 1, 1.1, 1.1.1 etc.');
@@ -145,16 +147,17 @@ export class ImportPlanModalComponent {
             result => `Row ${result.row}: ${result.errors.join(', ')}`
         );
         this.c_ErrorsCount = this.validationResults.length;
-        console.log('c_ErrorsCount:', this.c_ErrorsCount);
+        
         // If no validation errors, emit the validated data
         if (this.c_ErrorsCount === 0) {
-            console.log('Validation passed, emitting data:', this.uploadedData);
+            this.isImporting = true;
             this.import.emit(this.uploadedData);
-            this.closeModal();
         }
     }
 
     closeModal() {
-        this.close.emit();
+        if (!this.isImporting) {
+            this.close.emit();
+        }
     }
 }

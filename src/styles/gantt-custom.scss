@@ -1,0 +1,93 @@
+.compact-toolbar {
+    padding: 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    
+    .b-button {
+        padding: 0.35rem 0.6rem !important;
+        background-color: transparent !important;
+        border: 1px solid #d9d9d9 !important;
+        
+        &:not(.b-has-text) {
+            padding: 0.35rem !important;
+            min-width: 2.2rem !important;
+            height: 2.2rem !important;
+        }
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.04) !important;
+            border-color: #bfbfbf !important;
+        }
+
+        &:active {
+            background-color: rgba(0, 0, 0, 0.08) !important;
+        }
+    }
+
+    .b-button-group {
+        display: flex !important;
+        gap: 0.3rem !important;
+        padding: 0 0.2rem !important;
+        
+        &:not(:last-child) {
+            margin-right: 0.5rem !important;
+            position: relative !important;
+            
+            &::after {
+                content: '' !important;
+                position: absolute !important;
+                right: -0.5rem !important;
+                top: 15% !important;
+                height: 70% !important;
+                width: 1px !important;
+                background-color: rgba(0, 0, 0, 0.1) !important;
+            }
+        }
+    }
+
+    .b-textfield {
+        height: 2.2rem !important;
+        margin-left: 0.5rem !important;
+        
+        input {
+            height: 100% !important;
+            padding: 0.35rem 0.7rem !important;
+            border-radius: 4px !important;
+        }
+    }
+
+    // Make icons slightly smaller but keep them crisp
+    .b-fa {
+        font-size: 1rem !important;
+        line-height: 1 !important;
+        color: #595959 !important;
+    }
+
+    // Adjust dropdown menus
+    .b-menu {
+        padding: 0.4rem !important;
+        border-radius: 4px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+        
+        .b-menu-item {
+            padding: 0.4rem 0.6rem !important;
+            border-radius: 3px !important;
+            
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.04) !important;
+            }
+        }
+    }
+
+    // Style for the import button on the right
+    .b-blue {
+        background-color: #1890ff !important;
+        border-color: #1890ff !important;
+        
+        &:hover {
+            background-color: #40a9ff !important;
+            border-color: #40a9ff !important;
+        }
+    }
+} 

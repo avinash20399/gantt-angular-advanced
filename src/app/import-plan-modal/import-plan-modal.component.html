@@ -87,7 +87,7 @@
         <div [hidden]="!c_ValidationModeOn" class="validation-container">
             <div class="validation-header">
                 <span class="validation-title">Validation Results</span>
-                <button class="retry-btn" (click)="validateEntity()" [disabled]="!readyToValidate">
+                <button class="retry-btn" (click)="validateEntity()" [disabled]="!readyToValidate || isImporting">
                     Try Again
                 </button>
             </div>
@@ -106,8 +106,9 @@
             <!-- Success Message when no errors -->
             <div class="validation-success" *ngIf="c_ValidationModeOn && c_ErrorsCount === 0">
                 <div class="success-message">
-                    <i class="fas fa-check-circle"></i>
-                    Validation successful! Your data is ready to be imported.
+                    <i class="fas" [class.fa-check-circle]="!isImporting" [class.fa-spinner]="isImporting" [class.fa-spin]="isImporting"></i>
+                    <span *ngIf="!isImporting">Validation successful! Your data is ready to be imported.</span>
+                    <span *ngIf="isImporting">Importing your project plan... Please wait.</span>
                 </div>
             </div>
         </div>
@@ -117,7 +118,9 @@
         </div>
 
         <div class="modal-footer">
-            <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+            <button class="cancel-btn" (click)="closeModal()" [disabled]="isImporting">
+                {{ isImporting ? 'Importing...' : 'Cancel' }}
+            </button>
         </div>
     </div>
 </div>

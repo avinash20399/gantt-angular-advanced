@@ -15,17 +15,8 @@ export default class GanttToolbar extends Toolbar {
     // Called when toolbar is added to the Gantt panel
     set parent(parent) {
         super.parent = parent;
-
         const me = this;
-
         me.gantt = parent;
-
-        parent.project.on({
-            load: 'updateStartDateField',
-            refresh: 'updateStartDateField',
-            thisObj: me,
-        });
-
         me.styleNode = document.createElement('style');
         document.head.appendChild(me.styleNode);
     }
@@ -36,6 +27,7 @@ export default class GanttToolbar extends Toolbar {
 
     static get configurable() {
         return {
+            cls: 'compact-toolbar',  // Add custom class for styling
             items: [
                 {
                     type: 'buttonGroup',
@@ -44,17 +36,8 @@ export default class GanttToolbar extends Toolbar {
                             color: 'b-green',
                             ref: 'addTaskButton',
                             icon: 'b-fa b-fa-plus',
-                            text: 'Create',
                             tooltip: 'Create new task',
                             onAction: 'up.onAddTaskClick',
-                        },
-                        {
-                            color: 'b-blue',
-                            ref: 'importPlanButton',
-                            icon: 'b-fa b-fa-file-import',
-                            text: 'Import Plan',
-                            tooltip: 'Import project plan',
-                            onAction: 'up.onImportPlanClick',
                         },
                     ],
                 },
@@ -64,7 +47,6 @@ export default class GanttToolbar extends Toolbar {
                         {
                             ref: 'editTaskButton',
                             icon: 'b-fa b-fa-pen',
-                            text: 'Edit',
                             tooltip: 'Edit selected task',
                             onAction: 'up.onEditTaskClick',
                         },
@@ -115,18 +97,6 @@ export default class GanttToolbar extends Toolbar {
                             tooltip: 'Zoom to fit',
                             onAction: 'up.onZoomToFitClick',
                         },
-                        {
-                            ref: 'previousButton',
-                            icon: 'b-fa b-fa-angle-left',
-                            tooltip: 'Previous time span',
-                            onAction: 'up.onShiftPreviousClick',
-                        },
-                        {
-                            ref: 'nextButton',
-                            icon: 'b-fa b-fa-angle-right',
-                            tooltip: 'Next time span',
-                            onAction: 'up.onShiftNextClick',
-                        },
                     ],
                 },
                 {
@@ -136,7 +106,6 @@ export default class GanttToolbar extends Toolbar {
                             type: 'button',
                             ref: 'featuresButton',
                             icon: 'b-fa b-fa-tasks',
-                            text: 'Features',
                             tooltip: 'Toggle features',
                             toggleable: true,
                             menu: {
@@ -166,34 +135,8 @@ export default class GanttToolbar extends Toolbar {
                                         checked: false,
                                     },
                                     {
-                                        text: 'Highlight non-working time',
-                                        feature: 'nonWorkingTime',
-                                        checked: false,
-                                    },
-                                    {
                                         text: 'Enable cell editing',
                                         feature: 'cellEdit',
-                                        checked: false,
-                                    },
-                                    {
-                                        text: 'Show baselines',
-                                        feature: 'baselines',
-                                        checked: false,
-                                    },
-                                    {
-                                        text: 'Show rollups',
-                                        feature: 'rollups',
-                                        checked: false,
-                                    },
-                                    {
-                                        text: 'Show progress line',
-                                        feature: 'progressLine',
-                                        checked: false,
-                                    },
-                                    {
-                                        text: 'Hide schedule',
-                                        cls: 'b-separator',
-                                        subGrid: 'normal',
                                         checked: false,
                                     },
                                 ],
@@ -203,8 +146,7 @@ export default class GanttToolbar extends Toolbar {
                             type: 'button',
                             ref: 'settingsButton',
                             icon: 'b-fa b-fa-cogs',
-                            text: 'Settings',
-                            tooltip: 'Adjust settings',
+                            tooltip: 'Settings',
                             toggleable: true,
                             menu: {
                                 type: 'popup',
@@ -214,7 +156,6 @@ export default class GanttToolbar extends Toolbar {
                                     flexDirection: 'column',
                                 },
                                 onBeforeShow: 'up.onSettingsShow',
-
                                 items: [
                                     {
                                         type: 'slider',
@@ -236,50 +177,16 @@ export default class GanttToolbar extends Toolbar {
                                         max: 10,
                                         onInput: 'up.onSettingsMarginChange',
                                     },
-                                    {
-                                        type: 'slider',
-                                        ref: 'duration',
-                                        text: 'Animation duration ',
-                                        width: '12em',
-                                        min: 0,
-                                        max: 2000,
-                                        step: 100,
-                                        showValue: true,
-                                        onInput: 'up.onSettingsDurationChange',
-                                    },
                                 ],
                             },
                         },
-                        {
-                            type: 'button',
-                            color: 'b-red',
-                            ref: 'criticalPathsButton',
-                            icon: 'b-fa b-fa-fire',
-                            text: 'Critical paths',
-                            tooltip: 'Highlight critical paths',
-                            toggleable: true,
-                            onAction: 'up.onCriticalPathsClick',
-                        },
                     ],
-                },
-                {
-                    type: 'datefield',
-                    ref: 'startDateField',
-                    label: 'Project start',
-                    // required  : true, (done on load)
-                    flex: '0 0 17em',
-                    listeners: {
-                        change: 'up.onStartDateChange',
-                    },
                 },
                 {
                     type: 'textfield',
                     ref: 'filterByName',
                     cls: 'filter-by-name',
-                    flex: '0 0 12.5em',
-                    // Label used for material, hidden in other themes
-                    label: 'Find tasks by name',
-                    // Placeholder for others
+                    width: '15em',
                     placeholder: 'Find tasks by name',
                     clearable: true,
                     keyStrokeChangeDelay: 100,
@@ -291,6 +198,18 @@ export default class GanttToolbar extends Toolbar {
                     },
                     onChange: 'up.onFilterChange',
                 },
+                "->",
+                {
+                    type: "buttonGroup",
+                    items: [
+                        {
+                            ref: 'importPlanButton',
+                            icon: 'b-fa b-fa-file-import',
+                            tooltip: 'Import project plan',
+                            onAction: 'up.onImportPlanClick',
+                        },
+                    ]
+                }
             ],
         };
     }
