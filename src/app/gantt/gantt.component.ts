@@ -1,6 +1,6 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { BryntumGanttComponent } from '@bryntum/gantt-angular';
-import { Gantt,Toast } from '@bryntum/gantt';
+import { Gantt, Toast } from '@bryntum/gantt';
 import ganttProps from './gantt.config';
 import { DataService } from '../services/data.service';
 
@@ -32,17 +32,17 @@ export class GanttComponent implements AfterViewInit, OnInit {
         console.log('Starting loadInitialData...');
         const params = {
             project: '66300cee23006656a617f366',
-            timezone: 'Asia/Calcutta'
+            timezone: 'Asia/Calcutta',
         };
         console.log('Request params:', params);
-        
-        this.dataService.get<any>('projectmanagement/getAllTasksBryntumStruc', params).subscribe({
+
+        this.dataService.get<any>('project-plan').subscribe({
             next: (response) => {
                 console.log('Response received:', response);
                 if (response) {
                     // We have data, load it into the Gantt
                     const gantt = this.ganttComponent.instance;
-                    gantt.project.loadInlineData(response);
+                    gantt.project.loadInlineData(response.data);
                 } else {
                     // No data available, show import modal
                     this.showImportModal = true;
@@ -52,7 +52,7 @@ export class GanttComponent implements AfterViewInit, OnInit {
                 console.error('Error details:', {
                     status: error.status,
                     message: error.message,
-                    error: error.error
+                    error: error.error,
                 });
                 this.showImportModal = true;
             },
@@ -117,44 +117,42 @@ export class GanttComponent implements AfterViewInit, OnInit {
     // Handle import data
     onImportData(data: any) {
         console.log('Import data:', data);
-        
+
         // Show loading overlay
         const gantt = this.ganttComponent.instance;
         gantt.maskBody('Importing project plan...');
-        
-        this.dataService
-            .post<any>('http://localhost:3000/project-plan/import', data)
-            .subscribe({
-                next: (response) => {
-                    console.log('Import response:', response);
-                    // Load the new data
-                    gantt.project.loadInlineData(response.data);
-                    // Hide loading overlay
-                    gantt.unmaskBody();
-                    // Close modal
-                    this.showImportModal = false;
-                    // Show success message
-                    Toast.show({
-                        html: 'Project plan imported successfully!',
-                        cls: 'b-green b-toast',
-                        timeout: 3000,
-                        side: 'top-end'
-                    });
-                },
-                error: (error) => {
-                    console.error('Error importing data:', error);
-                    // Hide loading overlay
-                    gantt.unmaskBody();
-                    this.showImportModal = false;
-                    // Show error message
-                    Toast.show({
-                        html: 'Failed to import project plan. Please try again.',
-                        cls: 'b-red b-toast',
-                        timeout: 5000,
-                        side: 'top-end'
-                    });
-                },
-            });
+
+        this.dataService.post<any>('project-plan/import', data).subscribe({
+            next: (response) => {
+                console.log('Import response:', response);
+                // Load the new data
+                gantt.project.loadInlineData(response.data);
+                // Hide loading overlay
+                gantt.unmaskBody();
+                // Close modal
+                this.showImportModal = false;
+                // Show success message
+                Toast.show({
+                    html: 'Project plan imported successfully!',
+                    cls: 'b-green b-toast',
+                    timeout: 3000,
+                    side: 'top-end',
+                });
+            },
+            error: (error) => {
+                console.error('Error importing data:', error);
+                // Hide loading overlay
+                gantt.unmaskBody();
+                this.showImportModal = false;
+                // Show error message
+                Toast.show({
+                    html: 'Failed to import project plan. Please try again.',
+                    cls: 'b-red b-toast',
+                    timeout: 5000,
+                    side: 'top-end',
+                });
+            },
+        });
     }
 
     openImportModal() {
