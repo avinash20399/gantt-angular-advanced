@@ -14,16 +14,16 @@ const ganttProps: BryntumGanttProps = {
         autoSetConstraints: true,
         // Let the Project know we want to use our own Task model with custom fields / methods
         taskModelClass: Task,
-        transport: {
-            load: {
-                url: 'api/gantt/data',
-                method: 'GET',
-            },
-            sync: {
-                url: 'api/gantt/sync',
-                method: 'POST',
-            },
-        },
+        //transport: {
+        //    load: {
+        //        url: 'api/gantt/data',
+        //        method: 'GET',
+        //    },
+        //    sync: {
+        //        url: 'api/gantt/sync',
+        //        method: 'POST',
+        //    },
+        //},
         autoLoad: false,
 
         // The State TrackingManager, which the UndoRedo widget in the toolbar uses
@@ -38,6 +38,12 @@ const ganttProps: BryntumGanttProps = {
         // This config enables response validation and dumping of found errors to the browser console.
         // It's meant to be used as a development stage helper only, so please set it to false for production systems.
         validateResponse: true,
+    },
+
+    loadMask: {
+        maskDefaults: {
+            text: 'Loading...'
+        }
     },
 
     startDate: '2019-01-12',
@@ -69,7 +75,6 @@ const ganttProps: BryntumGanttProps = {
             text: 'Deadline',
             field: 'deadline',
         },
-        { type: 'addnew' },
     ],
 
     subGridConfigs: {
@@ -111,6 +116,10 @@ const ganttProps: BryntumGanttProps = {
                 type: 'textfield',
             },
         },
+    },
+    loadingmask: {
+        show: true,
+        text: 'Loading...',
     },
 
     tbar: {

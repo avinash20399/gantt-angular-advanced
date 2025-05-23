@@ -99,88 +99,311 @@ export default class GanttToolbar extends Toolbar {
                         },
                     ],
                 },
+                //{
+                //    type: 'buttonGroup',
+                //    items: [
+                //        {
+                //            type: 'button',
+                //            ref: 'featuresButton',
+                //            icon: 'b-fa b-fa-tasks',
+                //            tooltip: 'Toggle features',
+                //            toggleable: true,
+                //            menu: {
+                //                onItem: 'up.onFeaturesClick',
+                //                onBeforeShow: 'up.onFeaturesShow',
+                //                items: [
+                //                    {
+                //                        text: 'Show WBS code',
+                //                        checked: true,
+                //                        wbs: true,
+                //                        onItem: 'up.onShowWBSToggle'
+                //                    },
+                //                    {
+                //                        text: 'Task Editing',
+                //                        cls: 'b-separator',
+                //                        feature: 'cellEdit',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Draw Dependencies',
+                //                        feature: 'dependencies',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Task Labels',
+                //                        feature: 'labels',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Project Lines',
+                //                        feature: 'projectLines',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Critical Path',
+                //                        feature: 'criticalPaths',
+                //                        checked: false
+                //                    },
+                //                    {
+                //                        text: 'Progress Line',
+                //                        feature: 'progressLine',
+                //                        checked: false
+                //                    },
+                //                    {
+                //                        text: 'Enable Baselines',
+                //                        feature: 'baselines',
+                //                        checked: false
+                //                    },
+                //                    {
+                //                        text: 'Task Rollups',
+                //                        feature: 'rollups',
+                //                        checked: false
+                //                    },
+                //                    {
+                //                        text: 'Time Ranges',
+                //                        feature: 'timeRanges',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Non-working Time',
+                //                        feature: 'nonWorkingTime',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Enable Task Drag/Drop',
+                //                        feature: 'taskDrag',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Enable Task Resize',
+                //                        feature: 'taskResize',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Pan & Zoom',
+                //                        feature: 'pan',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Column Auto-Width',
+                //                        feature: 'columnAutoWidth',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Filter Bar',
+                //                        feature: 'filter',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Row Grouping',
+                //                        feature: 'group',
+                //                        checked: false
+                //                    },
+                //                    {
+                //                        text: 'Sort Tasks',
+                //                        feature: 'sort',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Task Context Menu',
+                //                        feature: 'taskContextMenu',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Header Context Menu',
+                //                        feature: 'headerContextMenu',
+                //                        checked: true
+                //                    },
+                //                    {
+                //                        text: 'Enable Striping',
+                //                        feature: 'stripe',
+                //                        checked: true
+                //                    }
+                //                ]
+                //            },
+                //        },
+                //        //{
+                //        //    type: 'button',
+                //        //    ref: 'settingsButton',
+                //        //    icon: 'b-fa b-fa-cogs',
+                //        //    tooltip: 'Settings',
+                //        //    toggleable: true,
+                //        //    menu: {
+                //        //        type: 'popup',
+                //        //        anchor: true,
+                //        //        cls: 'settings-menu',
+                //        //        layoutStyle: {
+                //        //            flexDirection: 'column',
+                //        //        },
+                //        //        onBeforeShow: 'up.onSettingsShow',
+                //        //        items: [
+                //        //            {
+                //        //                type: 'slider',
+                //        //                ref: 'rowHeight',
+                //        //                text: 'Row height',
+                //        //                width: '12em',
+                //        //                showValue: true,
+                //        //                min: 30,
+                //        //                max: 70,
+                //        //                onInput: 'up.onSettingsRowHeightChange',
+                //        //            },
+                //        //            {
+                //        //                type: 'slider',
+                //        //                ref: 'barMargin',
+                //        //                text: 'Bar margin',
+                //        //                width: '12em',
+                //        //                showValue: true,
+                //        //                min: 0,
+                //        //                max: 10,
+                //        //                onInput: 'up.onSettingsMarginChange',
+                //        //            },
+                //        //        ],
+                //        //    },
+                //        //},
+                //    ],
+                //},
                 {
-                    type: 'buttonGroup',
-                    items: [
-                        {
-                            type: 'button',
-                            ref: 'featuresButton',
-                            icon: 'b-fa b-fa-tasks',
-                            tooltip: 'Toggle features',
-                            toggleable: true,
-                            menu: {
-                                onItem: 'up.onFeaturesClick',
-                                onBeforeShow: 'up.onFeaturesShow',
-                                items: [
-                                    {
-                                        text: 'Show WBS code',
-                                        checked: true,
-                                        wbs: true,
-                                        onItem: 'up.onShowWBSToggle',
+                    ref     : 'featuresButton',
+                    type    : 'button',
+                    icon    : 'b-fa b-fa-tasks',
+                    text    : 'Settings',
+                    tooltip : 'Toggle features',
+                    menu    : {
+                        onItem       : 'up.onFeaturesClick',
+                        onBeforeShow : 'up.onFeaturesShow',
+                        // "checked" is set to a boolean value to display a checkbox for menu items. No matter if it is true or false.
+                        // The real value is set dynamically depending on the "disabled" config of the feature it is bound to.
+                        items        : {
+                            settings : {
+                                text : 'UI settings',
+                                icon : 'b-fa-sliders-h',
+                                menu : {
+                                    cls         : 'settings-menu',
+                                    layoutStyle : {
+                                        flexDirection : 'column'
                                     },
-                                    {
-                                        text: 'Draw dependencies',
-                                        cls: 'b-separator',
-                                        feature: 'dependencies',
-                                        checked: false,
+                                    onBeforeShow : 'up.onSettingsShow',
+                                    defaults     : {
+                                        type      : 'slider',
+                                        showValue : true
                                     },
-                                    {
-                                        text: 'Task labels',
-                                        feature: 'labels',
-                                        checked: true,
-                                    },
-                                    {
-                                        text: 'Project lines',
-                                        feature: 'projectLines',
-                                        checked: false,
-                                    },
-                                    {
-                                        text: 'Enable cell editing',
-                                        feature: 'cellEdit',
-                                        checked: false,
-                                    },
-                                ],
+                                    items : [
+                                        {
+                                            ref     : 'rowHeight',
+                                            text    : 'Row height',
+                                            min     : 30,
+                                            max     : 70,
+                                            onInput : 'up.onRowHeightChange'
+                                        },
+                                        {
+                                            ref     : 'barMargin',
+                                            text    : 'Bar margin',
+                                            min     : 0,
+                                            max     : 10,
+                                            onInput : 'up.onBarMarginChange'
+                                        },
+                                        {
+                                            ref     : 'duration',
+                                            text    : 'Animation duration',
+                                            min     : 0,
+                                            max     : 2000,
+                                            step    : 100,
+                                            onInput : 'up.onAnimationDurationChange'
+                                        },
+                                        {
+                                            ref     : 'radius',
+                                            text    : 'Dependency radius',
+                                            min     : 0,
+                                            max     : 10,
+                                            onInput : 'up.onDependencyRadiusChange'
+                                        }
+                                    ]
+                                }
                             },
-                        },
-                        //{
-                        //    type: 'button',
-                        //    ref: 'settingsButton',
-                        //    icon: 'b-fa b-fa-cogs',
-                        //    tooltip: 'Settings',
-                        //    toggleable: true,
-                        //    menu: {
-                        //        type: 'popup',
-                        //        anchor: true,
-                        //        cls: 'settings-menu',
-                        //        layoutStyle: {
-                        //            flexDirection: 'column',
-                        //        },
-                        //        onBeforeShow: 'up.onSettingsShow',
-                        //        items: [
-                        //            {
-                        //                type: 'slider',
-                        //                ref: 'rowHeight',
-                        //                text: 'Row height',
-                        //                width: '12em',
-                        //                showValue: true,
-                        //                min: 30,
-                        //                max: 70,
-                        //                onInput: 'up.onSettingsRowHeightChange',
-                        //            },
-                        //            {
-                        //                type: 'slider',
-                        //                ref: 'barMargin',
-                        //                text: 'Bar margin',
-                        //                width: '12em',
-                        //                showValue: true,
-                        //                min: 0,
-                        //                max: 10,
-                        //                onInput: 'up.onSettingsMarginChange',
-                        //            },
-                        //        ],
-                        //    },
-                        //},
-                    ],
+                            showWbs : {
+                                text    : 'Show WBS code',
+                                checked : true,
+                                onItem  : 'up.onShowWBSToggle'
+                            },
+                            drawDeps : {
+                                text    : 'Draw dependencies',
+                                feature : 'dependencies',
+                                checked : false
+                            },
+                            taskLabels : {
+                                text    : 'Task labels',
+                                feature : 'labels',
+                                checked : false
+                            },
+                            criticalPaths : {
+                                text    : 'Critical paths',
+                                feature : 'criticalPaths',
+                                tooltip : 'Highlight critical paths',
+                                checked : false
+                            },
+                            projectLines : {
+                                text    : 'Project lines',
+                                feature : 'projectLines',
+                                checked : false
+                            },
+                            nonWorkingTime : {
+                                text    : 'Highlight non-working time',
+                                feature : 'nonWorkingTime',
+                                checked : false
+                            },
+                            cellEdit : {
+                                text    : 'Enable cell editing',
+                                feature : 'cellEdit',
+                                checked : false
+                            },
+                            autoEdit : {
+                                text    : 'Auto edit',
+                                checked : false,
+                                onItem  : 'up.onAutoEditToggle'
+                            },
+                            columnLines : {
+                                text    : 'Show column lines',
+                                feature : 'columnLines',
+                                checked : true
+                            },
+                            rowLines : {
+                                text    : 'Show row lines',
+                                onItem  : 'up.onRowLinesToggle',
+                                checked : true
+                            },
+                            baselines : {
+                                text    : 'Show baselines',
+                                feature : 'baselines',
+                                checked : false
+                            },
+                            rollups : {
+                                text    : 'Show rollups',
+                                feature : 'rollups',
+                                checked : false
+                            },
+                            progressLine : {
+                                text    : 'Show progress line',
+                                feature : 'progressLine',
+                                checked : false
+                            },
+                            parentArea : {
+                                text    : 'Show parent area',
+                                feature : 'parentArea',
+                                checked : false
+                            },
+                            fillTicks : {
+                                text         : 'Stretch tasks to fill ticks',
+                                toggleConfig : 'fillTicks',
+                                checked      : false
+                            },
+                            hideSchedule : {
+                                text    : 'Hide schedule',
+                                cls     : 'b-separator',
+                                subGrid : 'normal',
+                                checked : false
+                            }
+                        }
+                    }
                 },
                 {
                     type: 'textfield',
@@ -362,26 +585,35 @@ export default class GanttToolbar extends Toolbar {
 
     onPlainSearchChange({ value }) {
         const plainValue = value || '';
-        this.triggerGanttAction('plainSearch', plainValue);
+        if (this.gantt.angularComponent) {
+            this.triggerGanttAction('plainSearch', plainValue);
+        } else {
+            // Fallback to direct filtering if Angular component is not available
+            this.onFilterChange({ value: plainValue });
+        }
     }
 
-    onFeaturesClick({ source: item }) {
+    onFeaturesClick({ source : item }) {
         const { gantt } = this;
 
         if (item.feature) {
             const feature = gantt.features[item.feature];
             feature.disabled = !feature.disabled;
-        } else if (item.subGrid) {
+        }
+        else if (item.subGrid) {
             const subGrid = gantt.subGrids[item.subGrid];
             subGrid.collapsed = !subGrid.collapsed;
         }
+        else if (item.toggleConfig) {
+            gantt[item.toggleConfig] = item.checked;
+        }
     }
 
-    onFeaturesShow({ source: menu }) {
+    onFeaturesShow({ source : menu }) {
         const { gantt } = this;
 
-        menu.items.map((item) => {
-            const { feature, wbs } = item;
+        menu.items.map(item => {
+            const { feature } = item;
 
             if (feature) {
                 // a feature might be not presented in the gantt
@@ -393,39 +625,41 @@ export default class GanttToolbar extends Toolbar {
                 else {
                     item.hide();
                 }
-            } else if (wbs) {
-                item.checked = this.gantt.columns.get('name').showWbs;
-            } else {
+            }
+            else if (item.subGrid) {
                 item.checked = gantt.subGrids[item.subGrid].collapsed;
             }
         });
     }
 
-    onSettingsShow({ source: menu }) {
-        const { gantt } = this,
-            { rowHeight, barMargin, duration } = menu.widgetMap;
+    onSettingsShow({ source : menu }) {
+        const
+            { gantt }                                  = this,
+            { rowHeight, barMargin, duration, radius } = menu.widgetMap;
 
         rowHeight.value = gantt.rowHeight;
         barMargin.value = gantt.barMargin;
-        barMargin.max = gantt.rowHeight / 2 - 5;
+        barMargin.max = (gantt.rowHeight / 2) - 5;
         duration.value = gantt.transitionDuration;
+        radius.value = gantt.features.dependencies.radius ?? 0;
     }
 
-    onSettingsRowHeightChange({ value }) {
+    onRowHeightChange({ value, source }) {
         this.gantt.rowHeight = value;
-        this.widgetMap.settingsButton.menu.widgetMap.barMargin.max =
-            value / 2 - 5;
+        source.owner.widgetMap.barMargin.max = (value / 2) - 5;
     }
 
-    onSettingsMarginChange({ value }) {
+    onBarMarginChange({ value }) {
         this.gantt.barMargin = value;
     }
 
-    onSettingsDurationChange({ value }) {
+    onAnimationDurationChange({ value }) {
         this.gantt.transitionDuration = value;
-        this.styleNode.innerHTML = `.b-animating .b-gantt-task-wrap { transition-duration: ${
-            value / 1000
-        }s !important; }`;
+        this.styleNode.innerHTML = `.b-animating .b-gantt-task-wrap { transition-duration: ${value / 1000}s !important; }`;
+    }
+
+    onDependencyRadiusChange({ value }) {
+        this.gantt.features.dependencies.radius = value;
     }
 
     onCriticalPathsClick({ source }) {
