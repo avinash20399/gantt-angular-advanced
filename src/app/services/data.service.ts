@@ -35,22 +35,22 @@ export class DataService {
 
     // POST request
     post<T>(endpoint: string, data: any): Observable<T> {
-        return this.http.post<T>(`${this.apiUrl}/${endpoint}`, data);
+        return this.http.post<T>(`${this.apiUrl}${endpoint}`, data);
     }
 
     // PUT request
     put<T>(endpoint: string, data: any): Observable<T> {
-        return this.http.put<T>(`${this.apiUrl}/${endpoint}`, data);
+        return this.http.put<T>(`${this.apiUrl}${endpoint}`, data);
     }
 
     // DELETE request
     delete<T>(endpoint: string): Observable<T> {
-        return this.http.delete<T>(`${this.apiUrl}/${endpoint}`);
+        return this.http.delete<T>(`${this.apiUrl}${endpoint}`);
     }
 
     // PATCH request
     patch<T>(endpoint: string, data: any): Observable<T> {
-        return this.http.patch<T>(`${this.apiUrl}/${endpoint}`, data);
+        return this.http.patch<T>(`${this.apiUrl}${endpoint}`, data);
     }
 
     // Method to set custom headers
