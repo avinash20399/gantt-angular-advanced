@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Output, ViewChild, ElementRef } from '@angular/core';
+import {
+    Component,
+    EventEmitter,
+    Output,
+    ViewChild,
+    ElementRef,
+} from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import * as XLSX from 'xlsx';
 
@@ -37,7 +43,7 @@ export class ImportPlanModalComponent {
 
     // Step handling
     step = 1;
-    
+
     // Validation states
     c_ValidationModeOn: boolean = false;
     c_ValidationResult: string[] = [];
@@ -56,7 +62,7 @@ export class ImportPlanModalComponent {
 
     private initForm() {
         this.myForm = this.fb.group({
-            file: ['']
+            file: [''],
         });
     }
 
@@ -81,10 +87,16 @@ export class ImportPlanModalComponent {
         const reader: FileReader = new FileReader();
         reader.onload = (e: any) => {
             const bstr: string = e.target.result;
-            const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary', cellDates: true });
+            const wb: XLSX.WorkBook = XLSX.read(bstr, {
+                type: 'binary',
+                cellDates: true,
+            });
             const wsname: string = wb.SheetNames[0];
             const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-            const rawData = XLSX.utils.sheet_to_json(ws, { raw: false, dateNF: 'DD-MM-YYYY' });
+            const rawData = XLSX.utils.sheet_to_json(ws, {
+                raw: false,
+                dateNF: 'DD-MM-YYYY',
+            });
             this.uploadedData = this.formatImportData(rawData);
             this.step = 3;
         };
@@ -92,17 +104,23 @@ export class ImportPlanModalComponent {
     }
 
     private formatImportData(data: any[]): ProjectPlanNode[] {
-        return data.map(row => {
+        return data.map((row) => {
             const formattedRow: any = {};
-            
+
             // Format all date fields to DD-MM-YYYY
-            const dateFields = ['plannedStartDate', 'plannedEndDate', 'actualStartDate', 'actualEndDate'];
-            dateFields.forEach(field => {
-                console.log("row[dielf]:",row[field]);
+            const dateFields = [
+                'plannedStartDate',
+                'plannedEndDate',
+                'actualStartDate',
+                'actualEndDate',
+            ];
+            dateFields.forEach((field) => {
+                console.log('row[dielf]:', row[field]);
                 if (row[field]) {
                     try {
                         // Check if the value is already in DD-MM-YYYY format
-                        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
+                        const dateRegex =
+                            /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
                         if (dateRegex.test(row[field])) {
                             formattedRow[field] = row[field];
                         } else {
@@ -110,16 +128,21 @@ export class ImportPlanModalComponent {
                             let date: Date;
                             if (typeof row[field] === 'number') {
                                 // Handle Excel serial number date
-                                date = new Date((row[field] - 25569) * 86400 * 1000);
+                                date = new Date(
+                                    (row[field] - 25569) * 86400 * 1000
+                                );
                             } else {
                                 // Try parsing as regular date string
                                 date = new Date(row[field]);
                             }
-                            
+
                             if (!isNaN(date.getTime())) {
                                 formattedRow[field] = this.formatDate(date);
                             } else {
-                                console.warn(`Invalid date format for ${field}:`, row[field]);
+                                console.warn(
+                                    `Invalid date format for ${field}:`,
+                                    row[field]
+                                );
                                 formattedRow[field] = null;
                             }
                         }
@@ -135,18 +158,27 @@ export class ImportPlanModalComponent {
                 'plannedWeightage',
                 'actualWeightage',
                 'plannedMilestonePercentage',
-                'actualMilestonePercentage'
+                'actualMilestonePercentage',
             ];
-            numericFields.forEach(field => {
+            numericFields.forEach((field) => {
                 if (row[field] !== undefined && row[field] !== null) {
                     const num = parseFloat(row[field]);
-                    formattedRow[field] = isNaN(num) ? 0 : Number(num.toFixed(2));
+                    formattedRow[field] = isNaN(num)
+                        ? 0
+                        : Number(num.toFixed(2));
                 }
             });
 
             // Convert other fields to strings
-            const stringFields = ['wbs', 'title', 'description', 'status', 'assignedTo', 'createdBy'];
-            stringFields.forEach(field => {
+            const stringFields = [
+                'wbs',
+                'title',
+                'description',
+                'status',
+                'assignedTo',
+                'createdBy',
+            ];
+            stringFields.forEach((field) => {
                 if (row[field] !== undefined && row[field] !== null) {
                     formattedRow[field] = row[field].toString().trim();
                 }
@@ -158,22 +190,24 @@ export class ImportPlanModalComponent {
 
     private formatDate(date: Date): string {
         // Add timezone offset to get correct local date
-        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        const localDate = new Date(
+            date.getTime() - date.getTimezoneOffset() * 60000
+        );
         const day = localDate.getDate().toString().padStart(2, '0');
         const month = (localDate.getMonth() + 1).toString().padStart(2, '0');
         const year = localDate.getFullYear();
-        return `${day}-${month}-${year}`;
+        return `${year}-${month}-${day}`;
     }
 
     validateEntity() {
         if (this.isImporting) return;
-        
+
         this.c_ValidationModeOn = true;
         this.validationResults = [];
         console.log('uploadedData:', this.uploadedData);
         this.uploadedData.forEach((row, idx) => {
             const errors: string[] = [];
-            
+
             // Updated validation rules for formatted data
             if (!row.wbs || !/^[0-9]+(\.[0-9]+)*$/.test(row.wbs)) {
                 errors.push('WBS must be in format like 1, 1.1, 1.1.1 etc.');
@@ -181,23 +215,40 @@ export class ImportPlanModalComponent {
             if (!row.title) {
                 errors.push('Title is required.');
             }
-            if (row.assignedTo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.assignedTo)) {
+            if (
+                row.assignedTo &&
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.assignedTo)
+            ) {
                 errors.push('AssignedTo must be a valid email.');
             }
-            if (row.createdBy && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.createdBy)) {
+            if (
+                row.createdBy &&
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.createdBy)
+            ) {
                 errors.push('CreatedBy must be a valid email.');
             }
 
-            // Validate date format (DD-MM-YYYY)
-            const dateRegex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
-            ['plannedStartDate', 'plannedEndDate', 'actualStartDate', 'actualEndDate'].forEach(field => {
+            // Validate date format (YYYY-MM-DD)
+            const dateRegex =
+                /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+            [
+                'plannedStartDate',
+                'plannedEndDate',
+                'actualStartDate',
+                'actualEndDate',
+            ].forEach((field) => {
                 if (row[field] && !dateRegex.test(row[field])) {
-                    errors.push(`${field} must be in DD-MM-YYYY format.`);
+                    errors.push(`${field} must be in YYYY-MM-DD format.`);
                 }
             });
 
             // Validate numeric fields (as numbers with 2 decimal places)
-            ['plannedWeightage', 'actualWeightage', 'plannedMilestonePercentage', 'actualMilestonePercentage'].forEach(field => {
+            [
+                'plannedWeightage',
+                'actualWeightage',
+                'plannedMilestonePercentage',
+                'actualMilestonePercentage',
+            ].forEach((field) => {
                 if (row[field] !== undefined && row[field] !== null) {
                     if (typeof row[field] !== 'number') {
                         errors.push(`${field} must be a number.`);
@@ -214,10 +265,10 @@ export class ImportPlanModalComponent {
 
         // Update validation results for display
         this.c_ValidationResult = this.validationResults.map(
-            result => `Row ${result.row}: ${result.errors.join(', ')}`
+            (result) => `Row ${result.row}: ${result.errors.join(', ')}`
         );
         this.c_ErrorsCount = this.validationResults.length;
-        
+
         // If no validation errors, emit the validated data
         if (this.c_ErrorsCount === 0) {
             this.isImporting = true;
