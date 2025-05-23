@@ -1,4 +1,5 @@
 import { Toolbar, Toast, DateHelper, CSSHelper } from '@bryntum/gantt';
+import { showToast } from './toast.config';
 /**
  * @module GanttToolbar
  */
@@ -523,7 +524,7 @@ export default class GanttToolbar extends Toolbar {
         if (gantt.selectedRecord) {
             gantt.editTask(gantt.selectedRecord);
         } else {
-            Toast.show('First select the task you want to edit');
+            showToast('First select the task you want to edit', 'warning');
         }
     }
 

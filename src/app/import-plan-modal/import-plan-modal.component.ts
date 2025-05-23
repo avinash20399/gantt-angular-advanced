@@ -81,10 +81,10 @@ export class ImportPlanModalComponent {
         const reader: FileReader = new FileReader();
         reader.onload = (e: any) => {
             const bstr: string = e.target.result;
-            const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
+            const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary', cellDates: true });
             const wsname: string = wb.SheetNames[0];
             const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-            const rawData = XLSX.utils.sheet_to_json(ws);
+            const rawData = XLSX.utils.sheet_to_json(ws, { raw: false, dateNF: 'DD-MM-YYYY' });
             this.uploadedData = this.formatImportData(rawData);
             this.step = 3;
         };
@@ -98,16 +98,34 @@ export class ImportPlanModalComponent {
             // Format all date fields to DD-MM-YYYY
             const dateFields = ['plannedStartDate', 'plannedEndDate', 'actualStartDate', 'actualEndDate'];
             dateFields.forEach(field => {
+                console.log("row[dielf]:",row[field]);
                 if (row[field]) {
                     try {
-                        const date = new Date(row[field]);
-                        if (!isNaN(date.getTime())) {
-                            formattedRow[field] = this.formatDate(date);
+                        // Check if the value is already in DD-MM-YYYY format
+                        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
+                        if (dateRegex.test(row[field])) {
+                            formattedRow[field] = row[field];
                         } else {
-                            formattedRow[field] = row[field].toString();
+                            // Try parsing as Excel date
+                            let date: Date;
+                            if (typeof row[field] === 'number') {
+                                // Handle Excel serial number date
+                                date = new Date((row[field] - 25569) * 86400 * 1000);
+                            } else {
+                                // Try parsing as regular date string
+                                date = new Date(row[field]);
+                            }
+                            
+                            if (!isNaN(date.getTime())) {
+                                formattedRow[field] = this.formatDate(date);
+                            } else {
+                                console.warn(`Invalid date format for ${field}:`, row[field]);
+                                formattedRow[field] = null;
+                            }
                         }
-                    } catch {
-                        formattedRow[field] = row[field].toString();
+                    } catch (error) {
+                        console.warn(`Error parsing date for ${field}:`, error);
+                        formattedRow[field] = null;
                     }
                 }
             });
@@ -139,9 +157,11 @@ export class ImportPlanModalComponent {
     }
 
     private formatDate(date: Date): string {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
+        // Add timezone offset to get correct local date
+        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        const day = localDate.getDate().toString().padStart(2, '0');
+        const month = (localDate.getMonth() + 1).toString().padStart(2, '0');
+        const year = localDate.getFullYear();
         return `${day}-${month}-${year}`;
     }
 
