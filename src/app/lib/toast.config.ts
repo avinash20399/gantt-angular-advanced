@@ -76,29 +76,32 @@ export const toastConfig = {
     success: {
         cls: 'b-toast-success',
         timeout: 3000,
-        side: 'top-end'
+        side: 'top-end' as const,
     },
     error: {
         cls: 'b-toast-error',
         timeout: 5000,
-        side: 'top-end'
+        side: 'top-end' as const,
     },
     warning: {
         cls: 'b-toast-warning',
         timeout: 4000,
-        side: 'top-end'
+        side: 'top-end' as const,
     },
     info: {
         cls: 'b-toast-info',
         timeout: 3000,
-        side: 'top-end'
-    }
+        side: 'top-end' as const,
+    },
 };
 
 // Helper function to show toasts
-export const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+export const showToast = (
+    message: string,
+    type: 'success' | 'error' | 'warning' | 'info' = 'info'
+) => {
     Toast.show({
         html: message,
-        ...toastConfig[type]
+        ...toastConfig[type],
     });
-}; 
+};
