@@ -84,10 +84,65 @@ export class ImportPlanModalComponent {
             const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
             const wsname: string = wb.SheetNames[0];
             const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-            this.uploadedData = XLSX.utils.sheet_to_json(ws);
+            const rawData = XLSX.utils.sheet_to_json(ws);
+            this.uploadedData = this.formatImportData(rawData);
             this.step = 3;
         };
         reader.readAsBinaryString(file);
+    }
+
+    private formatImportData(data: any[]): ProjectPlanNode[] {
+        return data.map(row => {
+            const formattedRow: any = {};
+            
+            // Format all date fields to DD-MM-YYYY
+            const dateFields = ['plannedStartDate', 'plannedEndDate', 'actualStartDate', 'actualEndDate'];
+            dateFields.forEach(field => {
+                if (row[field]) {
+                    try {
+                        const date = new Date(row[field]);
+                        if (!isNaN(date.getTime())) {
+                            formattedRow[field] = this.formatDate(date);
+                        } else {
+                            formattedRow[field] = row[field].toString();
+                        }
+                    } catch {
+                        formattedRow[field] = row[field].toString();
+                    }
+                }
+            });
+
+            // Handle numeric fields as numbers with 2 decimal precision
+            const numericFields = [
+                'plannedWeightage',
+                'actualWeightage',
+                'plannedMilestonePercentage',
+                'actualMilestonePercentage'
+            ];
+            numericFields.forEach(field => {
+                if (row[field] !== undefined && row[field] !== null) {
+                    const num = parseFloat(row[field]);
+                    formattedRow[field] = isNaN(num) ? 0 : Number(num.toFixed(2));
+                }
+            });
+
+            // Convert other fields to strings
+            const stringFields = ['wbs', 'title', 'description', 'status', 'assignedTo', 'createdBy'];
+            stringFields.forEach(field => {
+                if (row[field] !== undefined && row[field] !== null) {
+                    formattedRow[field] = row[field].toString().trim();
+                }
+            });
+
+            return formattedRow as ProjectPlanNode;
+        });
+    }
+
+    private formatDate(date: Date): string {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
     }
 
     validateEntity() {
@@ -98,45 +153,40 @@ export class ImportPlanModalComponent {
         console.log('uploadedData:', this.uploadedData);
         this.uploadedData.forEach((row, idx) => {
             const errors: string[] = [];
-            // Validation rules based on your DTO
-            if (!row["wbs"] || !/^[0-9]+(\.[0-9]+)*$/.test(row["wbs"])) {
+            
+            // Updated validation rules for formatted data
+            if (!row.wbs || !/^[0-9]+(\.[0-9]+)*$/.test(row.wbs)) {
                 errors.push('WBS must be in format like 1, 1.1, 1.1.1 etc.');
             }
-            if (!row["title"]) {
+            if (!row.title) {
                 errors.push('Title is required.');
             }
-            if (
-                row.assignedTo &&
-                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.assignedTo)
-            ) {
+            if (row.assignedTo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.assignedTo)) {
                 errors.push('AssignedTo must be a valid email.');
             }
-            if (
-                row.createdBy &&
-                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.createdBy)
-            ) {
+            if (row.createdBy && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.createdBy)) {
                 errors.push('CreatedBy must be a valid email.');
             }
-            [
-                'plannedStartDate',
-                'plannedEndDate',
-                'actualStartDate',
-                'actualEndDate',
-            ].forEach((field) => {
-                if (row[field] && isNaN(Date.parse(row[field]))) {
-                    errors.push(`${field} must be a valid ISO date.`);
+
+            // Validate date format (DD-MM-YYYY)
+            const dateRegex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
+            ['plannedStartDate', 'plannedEndDate', 'actualStartDate', 'actualEndDate'].forEach(field => {
+                if (row[field] && !dateRegex.test(row[field])) {
+                    errors.push(`${field} must be in DD-MM-YYYY format.`);
                 }
             });
-            [
-                'plannedWeightage',
-                'actualWeightage',
-                'plannedMilestonePercentage',
-                'actualMilestonePercentage',
-            ].forEach((field) => {
-                if (row[field] && isNaN(Number(row[field]))) {
-                    errors.push(`${field} must be a number.`);
+
+            // Validate numeric fields (as numbers with 2 decimal places)
+            ['plannedWeightage', 'actualWeightage', 'plannedMilestonePercentage', 'actualMilestonePercentage'].forEach(field => {
+                if (row[field] !== undefined && row[field] !== null) {
+                    if (typeof row[field] !== 'number') {
+                        errors.push(`${field} must be a number.`);
+                    } else if (row[field] < 0 || row[field] > 100) {
+                        errors.push(`${field} must be between 0 and 100.`);
+                    }
                 }
             });
+
             if (errors.length) {
                 this.validationResults.push({ row: idx + 2, errors }); // +2 for header and 0-index
             }

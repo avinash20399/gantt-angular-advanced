@@ -203,18 +203,7 @@ export class GanttComponent implements AfterViewInit, OnInit {
                     message: error.message,
                     error: error.error,
                 });
-                // Load demo data on error
-                const gantt = this.ganttComponent.instance;
-                console.log('Gantt instance at else:', this.ganttComponent.instance);
-                this.updateBrytummGanttData(this.getDemoData());
-                //const gantt = this.ganttComponent.instance;
-                //console.log('Gantt instance at error:', this.ganttComponent.instance);
-                gantt.project.loadInlineData(this.getDemoData());
-                Toast.show({
-                    html: 'Loaded demo data due to API error',
-                    cls: 'b-blue b-toast',
-                    timeout: 3000
-                });
+                this.showImportModal = true;
             },
         });
     }
@@ -366,8 +355,10 @@ export class GanttComponent implements AfterViewInit, OnInit {
         // Show loading overlay
         const gantt = this.ganttComponent.instance;
         gantt.maskBody('Importing project plan...');
-
-        this.dataService.post<any>('project-plan/import', data).subscribe({
+        const payload = {
+            "data":data
+        };
+        this.dataService.post<any>('project-plan/import', payload).subscribe({
             next: (response) => {
                 console.log('Import response:', response);
                 // Load the new data
