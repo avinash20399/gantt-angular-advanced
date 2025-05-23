@@ -99,10 +99,10 @@ export class ImportPlanModalComponent {
         this.uploadedData.forEach((row, idx) => {
             const errors: string[] = [];
             // Validation rules based on your DTO
-            if (!row["WBS"] || !/^[0-9]+(\.[0-9]+)*$/.test(row["WBS"])) {
+            if (!row["wbs"] || !/^[0-9]+(\.[0-9]+)*$/.test(row["wbs"])) {
                 errors.push('WBS must be in format like 1, 1.1, 1.1.1 etc.');
             }
-            if (!row["Title"]) {
+            if (!row["title"]) {
                 errors.push('Title is required.');
             }
             if (
