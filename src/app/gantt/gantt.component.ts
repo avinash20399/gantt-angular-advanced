@@ -1,10 +1,18 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { BryntumGanttComponent } from '@bryntum/gantt-angular';
-import { Gantt, Toast } from '@bryntum/gantt';
+import { Gantt, Toast, Button } from '@bryntum/gantt';
 import ganttProps from './gantt.config';
 import { DataService } from '../services/data.service';
 
-// Extend the Gantt type to include our custom property
+interface TaskChange {
+    taskId: number | string;
+    wbs: string;
+    changes: any[];
+    timestamp: Date;
+    type: 'update' | 'add' | 'remove';  // Added type to track operation type
+}
+
+// Extend the Gantt type to includtriggerGanttActione our custom property
 declare module '@bryntum/gantt' {
     interface Gantt {
         angularComponent?: GanttComponent;
@@ -21,11 +29,44 @@ export class GanttComponent implements AfterViewInit, OnInit {
     ganttProps = ganttProps;
     changedCells: any[] = [];
     showImportModal = false;
+    isEditMode = false;
+    private taskChanges: Map<number | string, TaskChange[]> = new Map();
+    
+    // Field mapping configuration for new tasks
+    private newTaskFieldMapping = {
+        name: (value: any) => value,  // Pass through
+        startDate: (value: any) => value,  // Pass through
+        duration: (value: any) => value || 1,  // Default to 1
+        percentDone: (value: any) => value || 0,  // Default to 0
+        schedulingMode: (value: any) => value || 'FixedDuration',
+        constraintType: (value: any) => value || 'startNoEarlierThan',
+        calendar: (value: any) => value || 'general',
+        status: (value: any) => value || 'Not Started'
+        // Add more field mappings as needed
+    };
 
     constructor(private dataService: DataService) {}
 
     ngOnInit() {
         // Initialization moved to ngAfterViewInit
+    }
+
+    private initializeEditingFeatures() {
+        const gantt = this.ganttComponent.instance;
+        
+        // Disable editing features by default
+        gantt.features.cellEdit.disabled = true;
+        gantt.features.taskEdit.disabled = true;
+        gantt.features.dependencies.disabled = true;
+        
+        // Update the edit button state in the toolbar
+        const toolbar = gantt.tbar;
+        if (toolbar) {
+            const editButton = toolbar.widgetMap.editModeButton as Button;
+            if (editButton) {
+                editButton.pressed = false;
+            }
+        }
     }
 
     private getDemoData() {
@@ -203,7 +244,16 @@ export class GanttComponent implements AfterViewInit, OnInit {
                     message: error.message,
                     error: error.error,
                 });
-                this.showImportModal = true;
+                //uncomment this to show the import modal
+                //this.showImportModal = true; 
+                Toast.show({
+                    html: 'Something went wrong, please try again!',
+                    cls: 'b-red b-toast',
+                    timeout: 3000,
+                    side: 'top-end',
+                });
+                //comment this to show the import modal
+                this.updateBrytummGanttData(this.getDemoData());
             },
         });
     }
@@ -274,26 +324,82 @@ export class GanttComponent implements AfterViewInit, OnInit {
 
     ngAfterViewInit(): void {
         console.log('ngAfterViewInit');
-        // Get the gantt instance
         const gantt = this.ganttComponent.instance;
-
-        // Expose the component to the gantt instance
         gantt.angularComponent = this;
-
-        // Load initial data after gantt is initialized
+        this.initializeEditingFeatures();
         this.loadInitialData();
 
         // Listen for task store changes
         gantt.taskStore.on({
+            add: ({ records }) => {
+                console.log('add', records);
+                if (this.isEditMode) {
+                    records.forEach(record => {
+                        const taskId = record.id;
+                        const mappedData = this.applyFieldMappings(record.data);
+                        
+                        const change: TaskChange = {
+                            taskId,
+                            wbs: record.wbsCode ?? '',
+                            changes: [mappedData],
+                            timestamp: new Date(),
+                            type: 'add'
+                        };
+                        console.log("change:", change);
+                        const existingChanges = this.taskChanges.get(taskId) || [];
+                        this.taskChanges.set(taskId, [...existingChanges, change]);
+                        
+                        console.log('Task added:', { taskId, mappedData,change });
+                        console.log("taskChanges:", this.taskChanges);
+                    });
+                }
+            },
+            remove: ({ records }) => {
+                if (this.isEditMode) {
+                    records.forEach(record => {
+                        const taskId = record.id;
+                        
+                        const change: TaskChange = {
+                            taskId,
+                            wbs: record.wbsCode ?? '',
+                            changes: [{ id: taskId }],
+                            timestamp: new Date(),
+                            type: 'remove'
+                        };
+
+                        const existingChanges = this.taskChanges.get(taskId) || [];
+                        this.taskChanges.set(taskId, [...existingChanges, change]);
+                        
+                        console.log('Task removed:', taskId);
+                    });
+                }
+            },
             change: ({ record, changes }) => {
-                if (changes) {
+                if (changes && this.isEditMode) {
+                    console.log('record', record);
+                    console.log('Changes:', changes);
+                    
+                    const taskId = record.id;
+                    const change: TaskChange = {
+                        taskId,
+                        wbs: record.wbsCode ?? '',
+                        changes: [changes],
+                        timestamp: new Date(),
+                        type: 'update'
+                    };
+
+                    const existingChanges = this.taskChanges.get(taskId) || [];
+                    this.taskChanges.set(taskId, [...existingChanges, change]);
+
                     this.changedCells.push({
                         taskId: record.id,
+                        wbs: record.wbsCode ?? '',
                         changes: changes,
                     });
                     console.log('Changed cells:', this.changedCells);
+                    console.log('Task changes history:', this.taskChanges);
                 }
-            },
+            }
         });
 
         // Listen for sync events
@@ -312,7 +418,7 @@ export class GanttComponent implements AfterViewInit, OnInit {
         return this.changedCells;
     }
 
-    // New method to handle toolbar actions
+    // Handle toolbar actions
     handleToolbarAction(action: string, data?: any) {
         console.log('Toolbar action:', action, data);
         switch (action) {
@@ -323,6 +429,12 @@ export class GanttComponent implements AfterViewInit, OnInit {
                 break;
             case 'plainSearch':
                 this.handleSearch(data);
+                break;
+            case 'toggleEdit':
+                this.toggleEditMode();
+                break;
+            case 'savePlan':
+                this.savePlan();
                 break;
             default:
                 console.warn('Unknown toolbar action:', action);
@@ -394,5 +506,162 @@ export class GanttComponent implements AfterViewInit, OnInit {
 
     openImportModal() {
         this.showImportModal = true;
+    }
+
+    // Toggle edit mode
+    toggleEditMode() {
+        const gantt = this.ganttComponent.instance;
+        this.isEditMode = !this.isEditMode;
+        
+        // Enable/disable editing features based on mode
+        gantt.features.cellEdit.disabled = !this.isEditMode;
+        gantt.features.taskEdit.disabled = !this.isEditMode;
+        gantt.features.dependencies.disabled = !this.isEditMode;
+        
+        // Update toolbar button states
+        const toolbar = gantt.tbar;
+        if (toolbar) {
+            const editButton = toolbar.widgetMap.editModeButton as Button;
+            const saveButton = toolbar.widgetMap.savePlanButton as Button;
+            
+            if (editButton) {
+                editButton.pressed = this.isEditMode;
+            }
+            
+            if (saveButton) {
+                saveButton.disabled = !this.isEditMode;
+            }
+        }
+        
+        // Show toast notification
+        Toast.show({
+            html: `Edit mode ${this.isEditMode ? 'enabled' : 'disabled'}`,
+            cls: `b-${this.isEditMode ? 'green' : 'blue'} b-toast`,
+            timeout: 3000,
+            side: 'top-end',
+        });
+    }
+
+    // Method to update field mapping
+    updateFieldMapping(field: string, mappingFn: (value: any) => any) {
+        this.newTaskFieldMapping[field] = mappingFn;
+    }
+
+    // Method to apply field mappings to a new task
+    private 
+    applyFieldMappings(taskData: any): any {
+        const mappedData = { ...taskData };
+        Object.keys(this.newTaskFieldMapping).forEach(field => {
+            if (field in taskData) {
+                mappedData[field] = this.newTaskFieldMapping[field](taskData[field]);
+            }
+        });
+        return mappedData;
+    }
+
+    // Save plan with all changes
+    savePlan() {
+        const gantt = this.ganttComponent.instance;
+        gantt.maskBody('Saving project plan...');
+
+        // Process all tasks and their changes
+        const processedTasks = new Map();
+        console.log("taskChanges at savePlan:", this.taskChanges);
+
+        Array.from(this.taskChanges.entries()).forEach(([taskId, changes]) => {
+            console.log("changes:", changes);
+            console.log("taskId:", taskId);
+            
+            // Sort changes by timestamp
+            const sortedChanges = changes.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+            console.log("sortedChanges:", sortedChanges);
+
+            // Track the latest change for each field
+            const fieldChanges = new Map();
+            
+            // Process all changes chronologically to build up the final state
+            sortedChanges.forEach(change => {
+                if (change.type === 'add') {
+                    // For add operations, set initial values for all fields
+                    const initialData = change.changes[0];
+                    Object.entries(initialData).forEach(([field, value]) => {
+                        fieldChanges.set(field, {
+                            value,
+                            timestamp: change.timestamp,
+                            operation: 'insert'
+                        });
+                    });
+                } else if (change.type === 'update') {
+                    // For updates, only override the specific fields that changed
+                    const updateData = change.changes[0];
+                    Object.entries(updateData).forEach(([field, value]) => {
+                        fieldChanges.set(field, {
+                            value,
+                            timestamp: change.timestamp,
+                            operation: 'update'
+                        });
+                    });
+                }
+            });
+
+            // Get the last change to determine if the task was deleted
+            const lastChange = sortedChanges[sortedChanges.length - 1];
+
+            if (lastChange.type === 'remove') {
+                // If the task was deleted, mark it as deleted
+                processedTasks.set(taskId, {
+                    taskId,
+                    operation: 'delete'
+                });
+            } else {
+                // Construct the final task state from field changes
+                const finalChanges = {};
+                const isNewTask = sortedChanges[0].type === 'add';
+                
+                fieldChanges.forEach((changeInfo, field) => {
+                    finalChanges[field] = changeInfo.value;
+                });
+
+                processedTasks.set(taskId, {
+                    taskId,
+                    operation: isNewTask ? 'insert' : 'update',
+                    [isNewTask ? 'data' : 'changes']: finalChanges
+                });
+            }
+        });
+
+        const payload = {
+            tasks: Array.from(processedTasks.values()),
+            projectId: '66300cee23006656a617f366'
+        };
+
+        console.log("Saving payload:", payload);
+
+        this.dataService.post<any>('project-plan/save', payload).subscribe({
+            next: (response) => {
+                console.log('Save response:', response);
+                this.taskChanges.clear();
+                this.changedCells = [];
+                gantt.unmaskBody();
+                
+                Toast.show({
+                    html: 'Project plan saved successfully!',
+                    cls: 'b-green b-toast',
+                    timeout: 3000,
+                    side: 'top-end',
+                });
+            },
+            error: (error) => {
+                console.error('Error saving plan:', error);
+                gantt.unmaskBody();
+                
+                Toast.show({
+                    html: 'Failed to save project plan. Please try again.',
+                    cls: 'b-red b-toast',
+                    timeout: 5000,
+                    side: 'top-end',
+                });
+            },
+        });
     }
 }

@@ -30,6 +30,25 @@ export default class GanttToolbar extends Toolbar {
         return {
             cls: 'compact-toolbar',  // Add custom class for styling
             items: [
+                
+                {
+                    type: 'textfield',
+                    ref: 'plainSearch',
+                    cls: 'b-textfield b-contains-focus',
+                    width: '16em',
+                    height: '2.5em',
+                    placeholder: 'Find tasks by title',
+                    clearable: false,
+                    //triggers: {
+                    //    expand: {
+                    //        align: 'end',
+                    //        cls: 'b-fa b-fa-angle-down',
+                    //        weight: 100
+                    //    }
+                    //},
+                    keyStrokeChangeDelay: 100,
+                    onChange: 'up.onPlainSearchChange'
+                },
                 {
                     type: 'buttonGroup',
                     items: [
@@ -407,22 +426,30 @@ export default class GanttToolbar extends Toolbar {
                     }
                 },
                 {
-                    type: 'textfield',
-                    ref: 'plainSearch',
-                    cls: 'b-textfield b-contains-focus',
-                    width: '16em',
-                    height: '2.5em',
-                    placeholder: 'Find tasks by name',
-                    clearable: false,
-                    //triggers: {
-                    //    expand: {
-                    //        align: 'end',
-                    //        cls: 'b-fa b-fa-angle-down',
-                    //        weight: 100
-                    //    }
-                    //},
-                    keyStrokeChangeDelay: 100,
-                    onChange: 'up.onPlainSearchChange'
+                    type: 'buttonGroup',
+                    items: [
+                        {
+                            ref: 'editModeButton',
+                            icon: 'b-fa b-fa-edit',
+                            text: 'Edit',
+                            tooltip: 'Toggle edit mode',
+                            toggleable: true,
+                            pressed: false,
+                            cls: 'b-button edit-mode-button',
+                            height: '1.6rem',
+                            onAction: 'up.onEditModeClick'
+                        },
+                        {
+                            ref: 'savePlanButton',
+                            icon: 'b-fa b-fa-save',
+                            text: 'Save',
+                            tooltip: 'Save all changes',
+                            cls: 'b-button',
+                            height: '1.6rem',
+                            disabled: true,
+                            onAction: 'up.onSavePlanClick'
+                        }
+                    ]
                 },
                 "->",
                 {
@@ -673,6 +700,14 @@ export default class GanttToolbar extends Toolbar {
 
     onImportPlanClick() {
         this.triggerGanttAction('importPlan');
+    }
+
+    onEditModeClick() {
+        this.triggerGanttAction('toggleEdit');
+    }
+
+    onSavePlanClick() {
+        this.triggerGanttAction('savePlan');
     }
 
     // endregion
